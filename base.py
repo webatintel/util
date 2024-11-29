@@ -526,7 +526,7 @@ class Util:
         if not sender:
             sender = 'webgraphics@intel.com'
         if not to:
-            to = 'yang.gu@intel.com'
+            to = 'hao.x.li@intel.com'
         if not type:
             type = 'plain'
 
