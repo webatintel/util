@@ -1058,6 +1058,7 @@ class Util:
         name = ''
         driver_date = ''
         driver_ver = ''
+        device_id = ''
 
         if Util.HOST_OS == Util.LINUX:
             # Util.ensure_pkg('mesa-utils')
@@ -1074,20 +1075,31 @@ class Util:
             if match:
                 driver_ver = match.group(1)
         elif Util.HOST_OS == Util.WINDOWS:
-            cmd = 'wmic path win32_VideoController get DriverDate,DriverVersion,Name,PNPDeviceID /value'
-            lines = Util.execute(cmd, show_cmd=False, return_out=True)[1].split('\n\n')
-            for line in lines:
-                match = re.match(r'(.*)=(.*)', line)
-                if match:
-                    if match.group(1) == 'DriverDate':
-                        driver_date = match.group(2)[0:8]
-                    elif match.group(1) == 'DriverVersion':
-                        driver_ver = match.group(2)
-                    elif match.group(1) == 'Name' and not match.group(2) == 'Microsoft Remote Display Adapter':
-                        name = match.group(2)
-                    elif match.group(1) == 'PNPDeviceID' and not match.group(2)[0:3] == 'SWD':
-                        device_id = re.search('DEV_(.{4})', match.group(2)).group(1)
-                        break
+            cmd = (
+                'powershell -Command "Get-CimInstance Win32_VideoController '
+                '| Select-Object DriverDate,DriverVersion,Name,PNPDeviceID | Format-List"'
+            )
+            raw_output = Util.execute(cmd, show_cmd=False, return_out=True)[1].replace('\r', '')
+            for block in raw_output.strip().split('\n\n'):
+                props = {}
+                for line in block.split('\n'):
+                    match = re.match(r'\s*(.+?)\s*:\s*(.*)', line)
+                    if match:
+                        props[match.group(1)] = match.group(2)
+                if not props:
+                    continue
+                if props.get('Name') == 'Microsoft Remote Display Adapter':
+                    continue
+                pnp_id = props.get('PNPDeviceID', '')
+                if pnp_id.startswith('SWD'):
+                    continue
+                name = props.get('Name', '')
+                driver_date = props.get('DriverDate', '')[:8]
+                driver_ver = props.get('DriverVersion', '')
+                device_match = re.search('DEV_(.{4})', pnp_id)
+                if device_match:
+                    device_id = device_match.group(1)
+                break
         return name, driver_date, driver_ver, device_id
 
     @staticmethod
