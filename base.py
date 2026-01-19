@@ -1063,12 +1063,12 @@ class Util:
         if Util.HOST_OS == Util.LINUX:
             # Util.ensure_pkg('mesa-utils')
             _, out = Util.execute('lspci -nn | grep VGA', return_out=True, log_file='')
-            match = re.search(': (.*) \[.*:(.*)\]', out)
+            match = re.search(r': (.*) \[.*:(.*)\]', out)
             name = match.group(1)
             device_id = match.group(2)
             if 'NVIDIA' in name:
                 _, driver_ver = Util.execute('nvidia-smi |grep Driver', return_out=True)
-                match = re.search('Driver Version: (\d+.\d+)', driver_ver)
+                match = re.search(r'Driver Version: (\d+.\d+)', driver_ver)
             else:
                 _, driver_ver = Util.execute('glxinfo | grep \'OpenGL version\'', return_out=True)
                 match = re.search('(Mesa.*)', driver_ver)
@@ -1106,7 +1106,7 @@ class Util:
     def get_os_info():
         if Util.HOST_OS == Util.WINDOWS:
             _, output = Util.execute('ver', show_cmd=False, return_out=True)
-            match = re.search('\[Version (.*)\]', output)
+            match = re.search(r'\[Version (.*)\]', output)
             ver = match.group(1)
         else:
             ver = platform.version()
