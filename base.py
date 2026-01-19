@@ -1428,10 +1428,13 @@ class Util:
     CONTRIB_INFO_NAME = 0
     CONTRIB_INFO_PATH = 1
     CONTRIB_INFO = {
+        'agenticbrowserextension': 'AgenticBrowserExtension',
+        'agenticbrowserkit': 'AgenticBrowserKit',
         'angle': 'ANGLE',
         'chromium': 'Chromium',
         'dawn': 'Dawn',
         'onnxruntime': 'ONNXRuntime',
+        'ovchromeextension': 'OVChromeExtension',
         'skia': 'Skia',
         'tfjs': 'TFJS',
         'v8': 'V8',
